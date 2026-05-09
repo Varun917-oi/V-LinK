@@ -1,0 +1,84 @@
+{
+  "name": "android-mirror-studio",
+  "version": "1.0.0",
+  "description": "Free Windows desktop app for Android USB and WiFi screen mirroring using ADB and scrcpy.",
+  "author": "Varun Chauhan (Verun Technologies)",
+  "license": "Proprietary",
+  "main": "electron/main.cjs",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on tcp:127.0.0.1:5173 && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5173 electron .\"",
+    "build": "powershell -ExecutionPolicy Bypass -File scripts/build-renderer.ps1",
+    "start": "electron .",
+    "check:tools": "node scripts/check-tools.mjs",
+    "pack": "npm run check:tools && npm run build && electron-builder --dir",
+    "dist": "npm run check:tools && npm run build && electron-builder --win nsis",
+    "dist:portable": "npm run check:tools && npm run build && powershell -ExecutionPolicy Bypass -File scripts/package-portable.ps1",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.0.0",
+    "electron-updater": "^6.3.9",
+    "framer-motion": "^12.0.0",
+    "lucide-react": "^0.468.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zustand": "^5.0.2"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.0",
+    "cross-env": "^7.0.3",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "eslint": "^9.16.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.16",
+    "vite": "^6.0.3",
+    "wait-on": "^8.0.1"
+  },
+  "build": {
+    "appId": "com.vlink.studio",
+    "productName": "MirrorLink",
+    "copyright": "Copyright © 2026 Verun Technologies",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "resources/bin",
+        "to": "bin",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "resources/recordings",
+        "to": "recordings",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.png",
+      "artifactName": "${productName}-${version}-Setup.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "MirrorLink"
+    }
+  }
+}
